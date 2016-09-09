@@ -1,0 +1,170 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<script src="../bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-demo-helpers/demo-snippet.html">
+<link rel="import" href="../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-checkbox/paper-checkbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../bower_components/paper-spinner/paper-spinner.html">
+<link rel="import" href="../bower_components/paper-styles/color.html">
+<link rel="import" href="../bower_components/paper-styles/typography.html">
+<link rel="import" href="../bower_components/iron-form/iron-form.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-localstorage/iron-localstorage.html">
+
+
+<dom-module id="my-login">
+
+
+
+    <button on-click="setajax">Click me</button>
+
+
+    <template>
+
+
+        <iron-ajax id="ajax"
+                   url="http://localhost:51182/token"
+                   method="POST"
+                   body="grant_type=password&username={{username}}&password={{password}}"
+                   last-Error="{{error}}"
+                   last-response="{{response}}">
+        </iron-ajax>
+
+        <iron-localstorage id="getHeader"
+                           name="getHeader"
+                           value="{{header}}"
+                           on-iron-localstorage-load-empty="initializeDefaultCartoon"></iron-localstorage>
+
+
+        <form is="iron-form" id="form">
+            <paper-input value="{{username}}" id="id" label="Id" required></paper-input>
+            <paper-input value="{{password}}" type="password" password label="pass" required></paper-input>
+
+            <paper-button raised on-click="setajax" id="submit">
+                <paper-spinner id="spinner" hidden></paper-spinner>Click me
+            </paper-button>
+        </form>
+
+        <div id="div_test">{{response.access_token}}</div>
+        <div>{{error.error}}</div>
+
+
+
+
+
+    </template>
+
+    <script>
+        function removeHeader() {
+            localStorage.clear();
+        }
+    </script>
+
+    <script>
+    Polymer({
+        is: 'my-login',
+
+        properties: {
+            username: String,
+            password: String,
+            error: {
+                type: Object,
+                observer:'_errorget'
+            },
+            response: {
+                type: Object,
+                observer:'_successLogin'
+            },
+            header: {
+                tyep: String,
+                notify :true
+            }
+
+
+        },
+
+        _successLogin:function(e){
+            if (this.response.access_token != null) {
+                this.header = this.response.access_token;
+                alert("Login Success!");
+
+            }
+        },
+
+        _errorget: function (e) {
+            if(this.error != null){
+                alert("Please check it your ID");
+                spinner.active = false;
+                spinner.hidden = true;
+                submit.disabled = false;
+                form.reset();
+                id.focus();
+            }
+        },
+
+
+        setajax: function (e) {
+
+            if (this.$.form.validate()) {
+                spinner.active = true;
+                spinner.hidden = false;
+                submit.disabled = true;
+
+                this.debounce('doSomething', function () {
+
+                    this.$.ajax.generateRequest();
+                }, 1500);
+
+
+            } else {
+                return;
+            }
+        },
+
+        _doSomething: function () {
+            this.debounce('doSomething', function () {
+                console.log('with-debounce needs to do something...');
+            }, 1000);
+        },
+
+        listeners: {
+            'error': 'ajaxError',
+
+        },
+
+        ajaxError: function (e) {
+            alert("¿¡·¯");
+        },
+
+
+        initializeDefaultCartoon: function () {
+            this.header = {
+                value: this.header
+
+            }
+        },
+
+        removeHeader: function () {
+            console.log(getHeader);
+            getHeader.clear();
+        }
+
+
+
+    });
+    </script>
+</dom-module>

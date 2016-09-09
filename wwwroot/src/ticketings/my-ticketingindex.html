@@ -1,0 +1,87 @@
+﻿<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="../../bower_components/iron-selector/iron-selector.html">
+
+<dom-module id="my-ticketingindex">
+    <template>
+        <app-route route="{{route}}"
+                   pattern="/:page"
+                   data="{{routeData}}"
+                   active="{{ticketingActive}}"></app-route>
+
+        <!--ticketingActive : {{ticketingActive}}<p></p>
+        page:{{routeData.page}}<p></p>-->
+        <iron-selector selected="[[page]]" attr-for-selected="name">
+            <a name="selectmovie" href="/ticketings/selectmovie">영화선택</a>
+            <a name="selectcinema" href="/ticketings/selectcinema">극장선택</a>
+            <a name="selectdate" href="/view2">날짜선택</a>
+            <a name="selecttime" href="/view3">시간선택</a>
+            <a name="selectman" href="/ticketings">인원선택</a>
+        </iron-selector>
+
+        <style include="shared-styles">
+            :host {
+                display: block;
+                padding: 10px;
+            }
+        </style>
+        <div class="card">
+            <iron-pages selected="[[page]]"
+                        attr-for-selected="name"
+                        fallback-selection="view404"
+                        role="main">
+                <my-selectmovie name="selectmovie"></my-selectmovie>
+                <my-selectcinema name="selectcinema"></my-selectcinema>
+            </iron-pages>
+        </div>
+    </template>
+    <script>
+    Polymer({
+        is: 'my-ticketingindex',
+          properties: {
+              page: {
+                  type: String,
+                  reflectToAttribute: true,
+                  observer: '_pageChanged'
+              }
+        },
+          observers: [
+            '_routePageChanged(routeData.page)'
+          ],
+          _routePageChanged: function (page) {
+              this.page = page || 'selectmovie';
+          },
+          _pageChanged: function (page) {
+
+              console.log(this.page);
+
+              ////if (fullUrl.indexOf("/ticketings/") > -1 && this.page != "view404") {
+              ////    resolvedPageUrl = this.resolveUrl('./ticketings/my-' + this.routeData.sub + '.html');
+              ////}
+              ////else {
+              //    // Load page import on demand. Show 404 page if fails
+              resolvedPageUrl = this.resolveUrl('/src/ticketings/my-' + page + '.html');
+
+              this.importHref(resolvedPageUrl, null, null, true);
+              ////}
+
+              ////if (page == "view404") {
+              ////    this.importHref(this.resolveUrl('my-view404.html'), null, null, true);
+              ////}
+              ////else {
+              
+              ////}
+
+          }
+    });
+    </script>
+</dom-module>
